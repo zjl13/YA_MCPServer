@@ -24,6 +24,15 @@ import prompts
 import resources
 from starlette.middleware.cors import CORSMiddleware
 
+# server.py (修改版)
+from mcp.server.fastmcp import FastMCP
+
+# 1. 导入你的工具逻辑
+from tools.yolo_v5_tool import yolo_v5_tool_logic
+from tools.yolo_v8_tool import yolo_v8_tool_logic
+
+mcp = FastMCP("YA_MCPServer")
+
 
 class YA_MCPServer:
     """
@@ -140,3 +149,14 @@ app = mcp_server.app
 
 if __name__ == "__main__":
     mcp_server.start()
+
+# 2. 注册工具
+@mcp.tool()
+async def detect_object_v5(image_base64: str, conf: float = 0.25, iou: float = 0.45) -> str:
+    """YOLOv5 物体检测工具"""
+    return await yolo_v5_tool_logic(image_base64, conf, iou)
+
+@mcp.tool()
+async def detect_object_v8(image_base64: str, conf: float = 0.25, iou: float = 0.45) -> str:
+    """YOLOv8 物体检测工具 (最新版模型)"""
+    return await yolo_v8_tool_logic(image_base64, conf, iou)
